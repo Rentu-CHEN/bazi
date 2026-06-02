@@ -453,7 +453,8 @@ function renderResults(data,a,bi2){
  var yr=a.year;h+='<div class="result-section"><div class="section-header" onclick="toggleSection(this)"><h3>九、'+data.cy+'年 ('+data.cyp+') 流年深度分析</h3><span class="arrow">▼</span></div><div class="section-body">';for(var i=0;i<yr.length;i++)h+='<p style="margin-bottom:10px">'+yr[i]+'</p>';h+='<span class="cite">参考：《渊海子平》《滴天髓阐微》《千里命稿》</span></div></div>';
  // 10. Q&A
 h+='<div class="result-section"><div class="section-header open" onclick="toggleSection(this)"><h3>十、常见问题自助咨询</h3><span class="arrow">▼</span></div><div class="section-body show">';
-h+='<p style="color:var(--muted);margin-bottom:16px;text-align:center">点击预设问题或输入你的问题，系统将结合命盘给出个性化回答</p>';
+h+='<p style="color:var(--muted);margin-bottom:8px;text-align:center">点击预设问题或输入你的问题，系统将结合命盘给出个性化回答</p>';
+h+='<p style="text-align:center;margin-bottom:16px;font-size:.9em;letter-spacing:1px" id="qaQuota"></p>';
 h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="qaCats">';
 var cats=[["婚","婚姻感情"],["业","事业工作"],["财","财运财富"],["康","健康养生"],["子","子女后代"],["运","运势走向"]];
 cats.forEach(function(c,i){h+='<button onclick="showQACat('+i+')" style="padding:8px 16px;border:1px solid var(--border);border-radius:20px;background:'+(i===0?'var(--accent)':'var(--card)')+';color:'+(i===0?'#fdf5e6':'var(--text)')+';cursor:pointer;font-family:inherit;font-size:.9em;letter-spacing:2px" id="qaCatBtn'+i+'">'+c[0]+' '+c[1]+'</button>'});
@@ -506,6 +507,25 @@ var QA=[
   {q:"我需要注意防范什么？",a:function(d,a2){var w=a2.marriage.warnings,h2=a2.health;var tips=[];if(w.length>0)tips.push("婚姻方面："+w[0].substring(0,50)+"...");if(h2.some(function(v){return v.indexOf("⚠")===0})){var wh=h2.find(function(v){return v.indexOf("⚠")===0});if(wh)tips.push("健康方面："+wh.substring(2,80)+"...")}tips.push("通用建议：投资需谨慎、交友要分辨、身体要保养——「君子终日乾乾，夕惕若厉，无咎。」");return tips.join("<br><br>");}}
  ]}
 ];
+// ===== QUESTION LIMIT (per device) =====
+var QA_LIMIT=10,QA_KEY="bazi_qacount";
+function getQACount(){try{var v=localStorage.getItem(QA_KEY);return v?parseInt(v):0}catch(e){return 0}}
+function addQACount(){var c=getQACount()+1;try{localStorage.setItem(QA_KEY,c)}catch(e){}return c}
+function qaQuotaLeft(){return Math.max(0,QA_LIMIT-getQACount())}
+function updateQuotaDisplay(){
+ var el=document.getElementById("qaQuota");
+ if(el){if(window.location.search.indexOf("free")>=0){el.innerHTML='<span style="color:var(--green)">无限提问模式</span>'}else{var left=qaQuotaLeft();el.innerHTML=left>0?'剩余提问次数：<strong style="color:var(--accent)">'+left+'</strong> / '+QA_LIMIT:'<span style="color:var(--red)">提问次数已用完（'+QA_LIMIT+'/'+QA_LIMIT+'），请分享链接给朋友，换设备继续提问</span>'}}
+}
+function checkQALimit(){
+ if(window.location.search.indexOf("free")>=0)return true;
+ if(qaQuotaLeft()<=0){
+  var el=document.getElementById("qaAnswer");
+  el.innerHTML='<strong>免费提问次数已用完</strong><br><br>本设备已用完'+QA_LIMIT+'次免费提问。八字分析本身无限使用，<br>如需继续提问，可以：<br>· 使用另一台设备（手机/平板/电脑）打开本链接<br>· 或将链接分享给朋友，互相交流命理心得<br>· 使用浏览器的无痕/隐私模式打开<br><br><span style="color:var(--muted)">这是一个小小的分享机制，希望更多人能体验到传统命理的智慧。</span>';
+  el.style.display="block";
+  return false;
+ }
+ return true;
+}
 var _qaCat=0;
 function showQACat(idx){
  _qaCat=idx;var qs=QA[idx].qs,el=document.getElementById("qaQuestions"),h="";
@@ -516,15 +536,18 @@ function showQACat(idx){
  document.getElementById("qaAnswer").style.display="none";
 }
 function askQA(qIdx){
+ if(!checkQALimit())return;
  var aEl=document.getElementById("qaAnswer");
  try{
   var d=window._baziData,a2=window._analysis;
   if(!d||!a2){aEl.innerHTML="请先进行八字分析后再使用咨询功能。";aEl.style.display="block";return}
   var answer=QA[_qaCat].qs[qIdx].a(d,a2);
+  addQACount();updateQuotaDisplay();
   aEl.innerHTML='<strong>'+QA[_qaCat].qs[qIdx].q+'</strong><br><br>'+answer;
   aEl.style.display="block";
  }catch(e){aEl.innerHTML="生成回答时出错，请重试。";aEl.style.display="block"}
 }
+ if(!checkQALimit())return;
 function askFreeQA(){
  var inp=document.getElementById("qaFreeInput");
  if(!inp||!inp.value.trim())return;
@@ -671,6 +694,7 @@ function askFreeQA(){
  el.innerHTML='<div style="line-height:2.2;font-size:.95em">'+ans+'</div>';
  el.style.display="block";
  inp.value="";
+ addQACount();updateQuotaDisplay();
 }
 setTimeout(function(){if(document.getElementById("qaCatBtn0"))showQACat(0)},100);
 </script>
