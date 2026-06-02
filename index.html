@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>八字命理分析</title>
 <style>
-#pwdOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#2c1810,#4a2c1a);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
-#pwdOverlay h2{color:#e8d5b7;letter-spacing:4px;font-weight:normal;margin-bottom:24px;font-size:1.8em}
-#pwdOverlay input{padding:12px 16px;border:1px solid #c9a96e;border-radius:4px;font-size:1.1em;background:#fffdf7;color:#3a3226;width:260px;text-align:center;letter-spacing:2px;outline:none}
-#pwdOverlay button{margin-top:16px;padding:10px 40px;background:linear-gradient(135deg,#8b4513,#a0522d);color:#fdf5e6;border:none;border-radius:4px;font-size:1em;letter-spacing:4px;cursor:pointer}
-#pwdOverlay .err{color:#e8a0a0;margin-top:12px;font-size:.9em;display:none}
+
 :root {--bg:#fdf6ec;--card:#fffef9;--border:#d4c5a9;--text:#3a3226;--accent:#8b4513;--gold:#c9a96e;--red:#a04040;--muted:#6b5e4e;--highlight:#fff8e7;--shadow:0 2px 12px rgba(0,0,0,0.06)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"Microsoft YaHei","SimSun",serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
@@ -74,12 +70,6 @@ select:disabled,input:disabled{background:#f0f0f0;color:#999;cursor:not-allowed}
 </style>
 </head>
 <body>
-<div id="pwdOverlay">
-<h2>请输入访问密码</h2>
-<input type="password" id="pwdInput" placeholder="请输入密码" onkeydown="if(event.key==='Enter')checkPwd()">
-<button onclick="checkPwd()">验 证</button>
-<div class="err" id="pwdErr">密码错误，请重试</div>
-</div>
 <div class="header"><h1>八字命理分析</h1><p>四柱八字 · 穷通宝鉴 · 三命通会 · 滴天髓阐微</p></div>
 <div class="container">
 <div class="form-card" id="formCard">
@@ -115,26 +105,7 @@ select:disabled,input:disabled{background:#f0f0f0;color:#999;cursor:not-allowed}
 </div>
 
 <script>
-// ========== PASSWORD GATE ==========
-var PWD_HASH = "606287ad8e27f1e6f8e76ced231e6e0a77dab8dde3b75c6cd74c47af1a6cb3ac";
-function buf2hex(b){return Array.prototype.map.call(new Uint8Array(b),function(x){return ("00"+x.toString(16)).slice(-2)}).join("")}
-async function checkPwd(){
- var inp=document.getElementById("pwdInput").value;
- if(!inp)return;
- var data=new TextEncoder().encode(inp);
- var hashBuf=await crypto.subtle.digest("SHA-256",data);
- if(buf2hex(hashBuf)===PWD_HASH){
-  document.getElementById("pwdOverlay").style.display="none";
- }else{
-  document.getElementById("pwdErr").style.display="block";
- }
-}
-// Entry: show overlay immediately
-document.addEventListener("DOMContentLoaded",function(){
- document.getElementById("pwdInput").focus();
- // Clear URL hash (don't store password)
- if(window.location.hash) history.replaceState(null,"",window.location.pathname+window.location.search);
-});
+
 // ==================== BASE DATA ====================
 var STEMS=["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
 var BRANCHES=["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
