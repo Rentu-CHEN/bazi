@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>周公解梦</title>
+<style>body{font-family:"Microsoft YaHei";background:#fdf6ec;padding:50px}.card{max-width:500px;margin:0 auto;background:#fffef9;padding:30px;border-radius:10px;border:1px solid #d4c5a9}h2{text-align:center;color:#8b4513}input{width:100%;padding:12px;border:1px solid #d4c5a9;border-radius:6px;font-size:16px;margin:10px 0}button{width:100%;padding:14px;background:#8b4513;color:white;border:none;border-radius:6px;font-size:18px;cursor:pointer}#r{margin-top:16px;padding:16px;background:#fff8e7;border-radius:6px}</style></head><body>
+<div class="card">
+<h2>周公解梦</h2>
+<input type="text" id="k" placeholder="输入梦境关键词，如：蛇、鱼、水、飞...">
+<button onclick="s()">查询释梦</button>
+<div id="r"></div>
+</div>
+<script>
+var D={
+"蛇":{ji:58,o:"蛇在梦中象征智慧与潜在威胁。蛇缠身主财运至；被蛇咬主贵人助。",g:{d:"单身者桃花旺但需谨慎",l:"恋爱中有隐藏矛盾需沟通",w:"职场有贵人也有竞争者"},a:"保持警惕但不必恐慌",y:"宜：整理家务、联系老友",j:"忌：冒险投资、轻信陌生人"},
+"鱼":{ji:82,o:"鱼通余，主富贵有余。大鱼主财运亨通。",g:{d:"桃花旺盛近期遇良缘",l:"感情和谐美满",w:"如鱼得水升职在望"},a:"顺势而为勿错良机",y:"宜：投资理财、商务谈判",j:"忌：过度消费"},
+"龙":{ji:95,o:"龙为百兽之尊，梦龙大吉大利。主权势富贵。",g:{d:"高层次对象出现",l:"感情升华宜求婚",w:"事业腾飞大胆进取"},a:"乘势而上放手去做",y:"宜：投资创业、求婚表白",j:"忌：骄做自满"},
+"飞":{ji:75,o:"梦见飞翔主渴望自由。飞得高志向远大。",g:{d:"感情自由发展",l:"彼此成长空间大",w:"新机会出现"},a:"飞得高也要降得稳",y:"宜：旅行学习",j:"忌：好高骛远"},
+"水":{ji:60,o:"水主财。清水主吉浑水主凶。",g:{d:"感情如流水顺自然",l:"沟通清晰感情顺",w:"财运起伏需看准时机"},a:"顺势而为",y:"宜：储蓄学习",j:"忌：冒险投机"},
+"掉牙":{ji:30,o:"梦见掉牙主焦虑。传统认为家中长辈健康需关注。",g:{d:"对形象担忧影响桃花",l:"缺乏安全感需伴侣关心",w:"对能力产生怀疑"},a:"放下自我怀疑",y:"宜：放松心情",j:"忌：过度焦虑"},
+"考试":{ji:50,o:"梦见考试主压力。即使毕业多年也常做此梦。",g:{d:"对自身标准过高",l:"感情中面临考验",w:"面临重要评估"},a:"紧张正常但不要被焦虑压垮",y:"宜：做好准备",j:"忌：熬夜突击"},
+"结婚":{ji:80,o:"梦见结婚主新开始。未婚者姻缘将近。",g:{d:"姻缘将近把握机会",l:"感情进入新阶段",w:"新合作即将达成"},a:"珍惜眼前人",y:"宜：表白心意",j:"忌：犹豫不决"},
+"房子":{ji:70,o:"房子主内心世界。新房主新开始。",g:{d:"渴望稳定关系",l:"感情基础稳固",w:"事业根基良好"},a:"关注内心定期清理",y:"宜：装修储蓄",j:"忌：冲动购房"},
+"鬼":{ji:25,o:"梦见鬼主内心恐惧。被鬼追是压力大的表现。",g:{d:"对亲密关系有恐惧",l:"未解决问题需面对",w:"工作压力巨大需减压"},a:"战胜恐惧最好方法是直面它",y:"宜：减压放松",j:"忌：熬夜独处"},
+"老虎":{ji:40,o:"虎主权威和挑战。面对强大对手需勇气。",g:{d:"对方强势需考虑",l:"需互相尊重",w:"职场竞争激烈"},a:"以柔克刚不要硬碰",y:"宜：锻炼制定计划",j:"忌：正面冲突"},
+"狗":{ji:65,o:"狗主朋友忠诚。友善主贵人。",g:{d:"通过朋友介绍",l:"感情基础稳固",w:"同事关系良好"},a:"珍惜忠诚的朋友",y:"宜：聚会社交",j:"忌：孤立自己"},
+"猫":{ji:45,o:"猫主女性直觉。温顺主人际和谐。",g:{d:"需擦亮眼睛识人",l:"猜疑需沟通化解",w:"谨言慎行防小人"},a:"相信直觉但勿过度猜疑",y:"宜：独立思考",j:"忌：轻信八卦"},
+"血":{ji:55,o:"血主财运。流血主财运至。",g:{d:"主动追求有新鲜感",l:"感情深厚关系紧密",w:"投入将换来回报"},a:"血浓于水珍惜家人",y:"宜：体检团聚",j:"忌：过度劳累"},
+"火":{ji:55,o:"火主事业激情。大火主兴旺。",g:{d:"勿被冲动蒙蔽",l:"需适度冷静",w:"事业强劲但防急躁"},a:"控制火候慢慢来",y:"宜：适度运动",j:"忌：发怒争吵"},
+"钱":{ji:70,o:"钱主自我价值。捡钱有小财运。",g:{d:"价值被认可",l:"物质感情需平衡",w:"财运上升期"},a:"钱是工具不是目的",y:"宜：理财储蓄",j:"忌：冲动消费赌博"},
+"海":{ji:65,o:"海主事业规模。平静主内心安宁。",g:{d:"内心充实吸引异性",l:"感情深如大海",w:"事业规模扩大"},a:"胸怀宽广但勿迷失",y:"宜：规划远行",j:"忌：盲目扩张"}
+};
+function s(){
+var kw=document.getElementById("k").value.trim();
+if(!kw)return;
+var ms=[];
+for(var k in D){if(kw.indexOf(k)>=0)ms.push(k)}
+if(ms.length===0){document.getElementById("r").innerHTML="<p>未匹配到关键词，试试：蛇、鱼、龙、水、飞、钱、房子</p>";return}
+if(ms.length===1){
+var d=D[ms[0]];
+var h="<h3>"+ms[0]+" (吉"+d.ji+"分)</h3><p>"+d.o+"</p>";
+h+="<p><b>单身：</b>"+d.g.d+"<br><b>恋爱：</b>"+d.g.l+"<br><b>职场：</b>"+d.g.w+"</p>";
+h+="<p><b>建议：</b>"+d.a+"</p><p style=color:green>"+d.y+"</p><p style=color:red>"+d.j+"</p>";
+document.getElementById("r").innerHTML=h;
+}else{
+var h="<p>你的描述涉及多个梦境关键词：</p>";
+for(var i=0;i<Math.min(ms.length,6);i++){h+="<p style=cursor:pointer onclick=\"document.getElementById('k').value='"+ms[i]+"';s()\"><b>"+ms[i]+"</b> - "+D[ms[i]].o.substring(0,40)+"...</p>"}
+document.getElementById("r").innerHTML=h;
+}
+}
+</script></body></html>
