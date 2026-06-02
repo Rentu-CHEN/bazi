@@ -81,8 +81,6 @@ select:disabled,input:disabled{background:#f0f0f0;color:#999;cursor:not-allowed}
 <div class="nav-tabs">
 <button class="nav-tab active" onclick="switchTab('bazi')">八字分析</button>
 <button class="nav-tab" onclick="switchTab('shushu')">术 数</button>
-<a href="zhougong.html" class="nav-tab" style="text-decoration:none">周公解梦</a>
-<a href="zhougong.html" class="nav-tab" style="text-decoration:none">周公解梦</a>
 </div>
 <div class="container">
 <!-- ====== BAZI PANEL ====== -->
@@ -887,8 +885,7 @@ setTimeout(function(){if(document.getElementById("qaCatBtn0"))showQACat(0)},100)
 function switchTab(name){
  document.querySelectorAll(".nav-tab").forEach(function(b){b.classList.remove("active")});
  document.querySelectorAll(".tab-panel").forEach(function(p){p.style.display="none"});
- var el=document.getElementById("panel-"+name);if(el)el.style.display="block";
- if(name==="shushu"){switchSubTab("xiaoliuren")}
+ var el=document.getElementById("panel-"+name);if(el)el.style.display="block";if(name==="shushu")switchSubTab("xiaoliuren");
 }
 function switchSubTab(name){
  document.querySelectorAll("#shushuTabs .sub-tab").forEach(function(b){b.classList.remove("active")});
