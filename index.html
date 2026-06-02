@@ -453,11 +453,17 @@ function renderResults(data,a,bi2){
  var yr=a.year;h+='<div class="result-section"><div class="section-header" onclick="toggleSection(this)"><h3>九、'+data.cy+'年 ('+data.cyp+') 流年深度分析</h3><span class="arrow">▼</span></div><div class="section-body">';for(var i=0;i<yr.length;i++)h+='<p style="margin-bottom:10px">'+yr[i]+'</p>';h+='<span class="cite">参考：《渊海子平》《滴天髓阐微》《千里命稿》</span></div></div>';
  // 10. Q&A
 h+='<div class="result-section"><div class="section-header open" onclick="toggleSection(this)"><h3>十、常见问题自助咨询</h3><span class="arrow">▼</span></div><div class="section-body show">';
-h+='<p style="color:var(--muted);margin-bottom:16px;text-align:center">点击下方问题，系统将结合你的命盘给出个性化回答</p>';
+h+='<p style="color:var(--muted);margin-bottom:16px;text-align:center">点击预设问题或输入你的问题，系统将结合命盘给出个性化回答</p>';
 h+='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px" id="qaCats">';
 var cats=[["婚","婚姻感情"],["业","事业工作"],["财","财运财富"],["康","健康养生"],["子","子女后代"],["运","运势走向"]];
 cats.forEach(function(c,i){h+='<button onclick="showQACat('+i+')" style="padding:8px 16px;border:1px solid var(--border);border-radius:20px;background:'+(i===0?'var(--accent)':'var(--card)')+';color:'+(i===0?'#fdf5e6':'var(--text)')+';cursor:pointer;font-family:inherit;font-size:.9em;letter-spacing:2px" id="qaCatBtn'+i+'">'+c[0]+' '+c[1]+'</button>'});
-h+='</div><div id="qaQuestions" style="margin-bottom:12px"></div><div id="qaAnswer" style="padding:14px;background:var(--highlight);border-radius:4px;min-height:60px;display:none"></div>';
+h+='</div>';
+h+='<div id="qaQuestions" style="margin-bottom:12px"></div>';
+h+='<div style="display:flex;gap:8px;margin-bottom:16px">';
+h+='<input type="text" id="qaFreeInput" placeholder="或在此输入你想问的问题..." style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:4px;font-family:inherit;font-size:.95em;background:var(--card);color:var(--text)" onkeydown="if(event.key==='+"'Enter'"+')askFreeQA()">';
+h+='<button onclick="askFreeQA()" style="padding:10px 20px;background:var(--accent);color:#fdf5e6;border:none;border-radius:4px;cursor:pointer;font-family:inherit;font-size:.95em;letter-spacing:2px;white-space:nowrap">提问</button>';
+h+='</div>';
+h+='<div id="qaAnswer" style="padding:14px;background:var(--highlight);border-radius:4px;min-height:60px;display:none"></div>';
 h+='</div></div>';
 h+='<div style="padding:20px;text-align:center;font-size:0.8em;color:var(--muted);line-height:2">以上分析基于八字命理古典典籍的推演，仅供文化参考。<br>命理之说，信则有、不信则无。<br>《了凡四训》云「命自我立，福自己求」，人生的主动权终究掌握在自己手中。</div>';
  document.getElementById("results").innerHTML=h;
@@ -518,6 +524,153 @@ function askQA(qIdx){
   aEl.innerHTML='<strong>'+QA[_qaCat].qs[qIdx].q+'</strong><br><br>'+answer;
   aEl.style.display="block";
  }catch(e){aEl.innerHTML="生成回答时出错，请重试。";aEl.style.display="block"}
+}
+function askFreeQA(){
+ var inp=document.getElementById("qaFreeInput");
+ if(!inp||!inp.value.trim())return;
+ var q=inp.value.trim(),d=window._baziData,a2=window._analysis,el=document.getElementById("qaAnswer");
+ if(!d||!a2){el.innerHTML="请先进行八字分析后再使用咨询功能。";el.style.display="block";return}
+ var ans="";
+ // ========== DETECT INTENT ==========
+ var hasMar=/(婚姻|结婚|老公|老婆|配偶|丈夫|妻子|离婚|感情|对象|夫|妻|嫁|娶)/;
+ var hasTime=/(什么时候|何时|哪年|哪一年|几岁|年龄|多少岁|啥时候|何时)/;
+ var hasJob=/(工作|职业|创业|打工|上班|公司|升职|跳槽|适合干什么|做什么|干什|转行|面试|单位)/;
+ var hasMoney=/(发财|赚钱|财运|投资|理财|股票|基金|破财|生意|经商|收入|存款|钱|财|富裕|穷|有钱|没钱)/;
+ var hasHealth=/(健康|身体|生病|疾病|运动|锻炼|养生|疼|痛|不舒服|保健|体质|弱|虚|胖|瘦|精神)/;
+ var hasChild=/(孩子|子女|小孩|儿子|女儿|宝宝|怀孕|生育|备孕|几胎|生几个|后代|出息)/;
+ var hasLuck=/(运势|运气|流年|好运|倒霉|顺利|不顺|走运|转运|什么时候好|最近|这几年|大运|流年)/;
+ var hasWho=/(什么人|什么样的|性格|人品|怎样|怎么样|如何|是什么样)/;
+ var hasPerson=/(我|命主|自己|本人)/;
+ var hasNow=/(现在|当前|最近|今年|当下|目前)/;
+
+ // ========== MARRIAGE ==========
+ if(hasMar.test(q)){
+  var lp=a2.luck.pillars,g4=d.gd,spStar2="",spStem2="",spArr=[];
+  ["年","月","时"].forEach(function(k){var gv=tg(d.ds,d.ps[k].stem)[0];if((gv.indexOf("官")>=0||gv.indexOf("杀")>=0)&&g4==="女"){spArr.push({k:k,stem:d.ps[k].stem,god:gv})}});
+  ["年","月","时"].forEach(function(k){var gv=tg(d.ds,d.ps[k].stem)[0];if(gv.indexOf("财")>=0&&g4==="男"){spArr.push({k:k,stem:d.ps[k].stem,god:gv})}});
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  ans+='<span style="color:var(--accent)">【命盘分析】</span><br>';
+  ans+='你的命盘为'+d.gd+'命，日主'+d.ds+SW[d.ds]+'，生于'+d.ps["月"].branch+'月，日坐'+d.db+'（夫妻宫）。<br><br>';
+  if(spArr.length>0){spArr.forEach(function(s){ans+=s.k+'柱透出'+s.stem+'为'+s.god+'（配偶星），说明配偶在命局中有明确的信息。<br>';});}
+  else{ans+='配偶星在命局中藏于地支不透干，配偶的信息较为含蓄，需结合大运流年来判断缘分出现的时机。<br>';}
+  if(hasTime.test(q)){
+   ans+='<br><span style="color:var(--accent)">【时间预测】</span><br>';
+   var found2=false;lp.forEach(function(p){var tg2=p.tgod;if(!found2&&g4==="女"&&tg2.indexOf("官")>=0){ans+='最佳婚期在<strong>'+p.gz+'大运（'+p.ar+'）</strong>，此运官星当旺，夫缘显现。建议在运程初期（约'+p.sy2+'年前后）积极寻找或把握良缘。<br>';found2=true}else if(!found2&&g4==="男"&&tg2.indexOf("财")>=0){ans+='最佳婚期在<strong>'+p.gz+'大运（'+p.ar+'）</strong>，此运财星当旺，妻缘显现。<br>';found2=true}});
+   if(!found2)ans+='配偶星大运尚未明显出现，建议在官/财星透出的流年积极社交，缘分自会到来。<br>';
+  }
+  if(hasWho.test(q)){
+   ans+='<br><span style="color:var(--accent)">【配偶特征】</span><br>';
+   var sp2=a2.marriage.spouse;if(sp2&&sp2.length>0){sp2.forEach(function(s){ans+=s+'<br>'});}
+   else{ans+='日坐'+d.db+'，配偶性格与夫妻宫'+d.db+'密切相关，详细特征可参考上方婚姻分析中的「配偶性格画像」。<br>';}
+  }
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《三命通会》论女命：官星为夫主，清透者良缘早定；《渊海子平》云：财官印全，三宝流通，婚姻得助。日支为夫妻宫，其藏干和五行直接反映配偶的特质和婚姻质量。<br>';
+ }
+
+ // ========== CAREER ==========
+ else if(hasJob.test(q)){
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  ans+='<span style="color:var(--accent)">【命盘分析】</span><br>';
+  var dw5=SW[d.ds]||"",s5=a2.strength,fav2=s5.fav||[],tgd3={};["年","月","时"].forEach(function(k){tgd3[k]=tg(d.ds,d.ps[k].stem)[0]});
+  ans+='你的日主为'+d.ds+dw5+'，'+s5.strength+'（'+s5.grade+'），十二长生状态：'+s5.s12+'于'+s5.mb+'月。<br><br>';
+  var hasS2=Object.values(tgd3).some(function(v){return v.indexOf("食")>=0||v.indexOf("伤")>=0});
+  var hasC3=Object.values(tgd3).some(function(v){return v.indexOf("财")>=0});
+  var hasG=Object.values(tgd3).some(function(v){return v.indexOf("官")>=0||v.indexOf("杀")>=0});
+  var hasY=Object.values(tgd3).some(function(v){return v.indexOf("印")>=0});
+  ans+='<span style="color:var(--accent)">【事业方向】</span><br>';
+  if(hasS2&&hasC3)ans+='命局食伤生财，才华可转化为财富。最适合<strong>文化创意、技术开发、策划咨询</strong>类工作，也可<strong>自主创业</strong>，将个人能力最大化变现。<br>';
+  else if(hasS2)ans+='食伤旺相，才华外显。适合<strong>技术型、创意型</strong>工作，如设计、编程、写作、教育等。一技之长是立身之本。<br>';
+  else if(hasG&&hasY)ans+='官印双全，适合<strong>体制内、大公司、事业单位</strong>等稳定环境。有管理能力，适合走仕途或担任管理岗位。<br>';
+  else if(hasC3)ans+='财星透干，有商业天赋。适合<strong>销售、贸易、金融</strong>等与金钱直接相关的行业。<br>';
+  else ans+='建议结合喜用神'+fav2.slice(0,2).join('、')+'选择职业方向，从事相关五行行业更有利。<br>';
+  ans+='<br><span style="color:var(--accent)">【当前时机】</span><br>';
+  var cl2=d.cl;if(cl2)ans+='当前正行<strong>'+cl2.gz+'大运（'+cl2.ar+'）</strong>，运干为'+cl2.tgod+'。'+(cl2.tgod.indexOf("官")>=0?'官星当运，事业上升期，适合争取晋升或转换跑道。':cl2.tgod.indexOf("财")>=0?'财运当旺，宜开拓业务、增加收入渠道。':cl2.tgod.indexOf("印")>=0?'印运安稳，适合学习积累、稳固基础。':cl2.tgod.indexOf("食")>=0||cl2.tgod.indexOf("伤")>=0?'才华可展，创造力爆发期，适合创新和突破。':'宜稳中求进，积累人脉和资源。')+'<br>';
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《滴天髓》论'+d.ds+dw5+'：'+DTS[d.ds]+'。'+dw5+'为流动之物，天然适合流动性行业。《子平真诠》云：食伤泄秀者技艺超群，官印相生者贵气在身。<br>';
+ }
+
+ // ========== MONEY ==========
+ else if(hasMoney.test(q)){
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  var wl2=a2.career.wealth||[],cw2=WC[SW[d.ds]||""],kuMap={"木":"未","火":"戌","土":"辰","金":"丑","水":"戌"},hasKu=false;
+  ["年","月","日","时"].forEach(function(k){if(d.ps[k].branch===kuMap[cw2])hasKu=true});
+  ans+='<span style="color:var(--accent)">【财运格局】</span><br>';
+  if(hasKu)ans+='命局有<strong>财库（'+kuMap[cw2]+'）</strong>坐'+cw2+'财之位，天生善于积蓄，财富不轻易外流。《三命通会》云：「日坐财库，无人不富。」<br>';
+  if(wl2.length>0)ans+=wl2.slice(0,2).join('<br>')+'<br>';
+  if(hasTime.test(q)){
+   ans+='<br><span style="color:var(--accent)">【发财时机】</span><br>';
+   var lp2=a2.luck.pillars,fw2=false;lp2.forEach(function(p){if(!fw2&&p.tgod.indexOf("财")>=0&&p.sy2>=d.cy){ans+='<strong>'+p.gz+'大运（'+p.ar+'）</strong>财星当旺，是财富积累黄金期。此运中收入明显增长，投资也容易获利。<br>';fw2=true}});
+   if(!fw2)ans+='当前处于积累期，财运大运尚未到来。建议在此期间投资自己、积累资源，等待财运大运到来时厚积薄发。<br>';
+  }
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《渊海子平》：财为养命之源。《子平真诠》：财星透干者善于理财，财藏支中者富不外显。身旺能担财者富贵可期，身弱财旺者反为富屋贫人。<br>';
+ }
+
+ // ========== HEALTH ==========
+ else if(hasHealth.test(q)){
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  var dw6=SW[d.ds]||"",body6={"木":"肝胆、筋骨、神经系统","火":"心脏、眼睛、血液系统","土":"脾胃、肌肉、皮肤","金":"肺、呼吸道、大肠","水":"肾、膀胱、泌尿生殖系统"};
+  ans+='<span style="color:var(--accent)">【体质总评】</span><br>';
+  ans+='日主为'+d.ds+dw6+'，命局最需关注：<strong>'+body6[dw6]+'</strong>。<br><br>';
+  var wc4=d.wc;for(var w in wc4){var c=wc4[w];if(c>=4)ans+='⚠ <strong>'+w+'过旺</strong>（力量'+c.toFixed(1)+'），注意'+(w==="木"?"肝胆火旺、易怒":w==="火"?"心血管、失眠多梦":w==="土"?"脾胃湿热、消化不良":w==="金"?"肺燥咳嗽、皮肤干燥":w==="水"?"肾虚水肿、腰膝酸软":"")+'。<br>';else if(c<=1)ans+=w+'<strong>偏弱</strong>（力量'+c.toFixed(1)+'），注意'+(w==="木"?"肝血不足、视力疲劳":w==="火"?"心气不足、畏寒体冷":w==="土"?"脾胃虚弱、吸收差":w==="金"?"肺气不足、易感冒":w==="水"?"肾气不足、精力不济":"")+'。<br>'}
+  ans+='<br><span style="color:var(--accent)">【养生建议】</span><br>';
+  var move={"木":"瑜伽、太极、拉伸运动","火":"跑步、游泳、有氧运动","土":"健身、登山、八段锦","金":"深呼吸、慢跑、太极","水":"游泳、瑜伽、冥想"};
+  ans+='适合运动：'+move[dw6]+'。<br>饮食方面，'+(dw6==="木"?"多吃绿色蔬菜，少油腻":dw6==="火"?"清淡为主，少辛辣":dw6==="土"?"规律进食，少生冷":dw6==="金"?"润肺食物，如梨、百合":dw6==="水"?"补肾食物，黑豆、核桃":"")+'。<br>';
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《滴天髓》云：五行偏枯，即为疾病之根。《五行精纪》指出，八字五行贵在流通平衡，过旺者泄之，过弱者补之。了解自身五行偏颇，就能有针对性地调理预防。<br>';
+ }
+
+ // ========== CHILDREN ==========
+ else if(hasChild.test(q)){
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  var sc2=0;["年","月","日","时"].forEach(function(k){var gv=tg(d.ds,d.ps[k].stem)[0];if(gv.indexOf("食")>=0||gv.indexOf("伤")>=0)sc2++;ghs(d.ps[k].branch).forEach(function(hs){var gv2=tg(d.ds,hs)[0];if(gv2.indexOf("食")>=0||gv2.indexOf("伤")>=0)sc2+=0.5})});
+  ans+='<span style="color:var(--accent)">【子女缘】</span><br>';
+  ans+='命局中食伤星（子女星）力量约'+sc2.toFixed(1)+'。';
+  if(sc2>=3)ans+='子女缘分较旺，传统认为可能有2-3个孩子。<br>';
+  else if(sc2>=1.5)ans+='子女缘中等，传统认为有1-2个孩子。<br>';
+  else ans+='子女缘偏浅，但也因此会更珍惜与孩子的感情。<br>';
+  ans+='时柱为子女宫：<strong>'+d.ps["时"].gz+'</strong>，'+(SY[d.ps["时"].stem]==="阳"?"时干为阳，子女性格外向、独立有主见。":"时干为阴，子女性格温和、细心体贴。")+'<br>';
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《三命通会》：食神为子星，伤官为女星。时柱代表子女宫，为子女的根基所在。食伤在命局中的旺衰、清浊，直接反映子女的多少和优劣。<br>';
+ }
+
+ // ========== LUCK / GENERAL ==========
+ else if(hasLuck.test(q)||hasNow.test(q)){
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  ans+='<span style="color:var(--accent)">【当前运势】</span><br>';
+  ans+='现在是<strong>'+d.cy+'年（流年'+d.cyp+'）</strong>。<br>';
+  var yg3=tg(d.ds,d.cyp[0])[0];ans+='今年流年天干为'+yg3+'，';
+  if(yg3.indexOf("财")>=0)ans+='财运当旺，收入增加但开销也大。事业有新机遇，适合开拓新业务或跳槽。<br>';
+  else if(yg3.indexOf("官")>=0||yg3.indexOf("杀")>=0)ans+='官杀当值，事业压力与机遇并存，可能有晋升或工作变动。'+d.gd+'命请注意感情方面的动态。<br>';
+  else if(yg3.indexOf("印")>=0)ans+='印星护身之年，适合学习进修、考证，有贵人相助。宜沉淀积累、不宜冒进。<br>';
+  else if(yg3.indexOf("食")>=0||yg3.indexOf("伤")>=0)ans+='才华展现之年，创意十足。适合发挥特长，但注意言行别太直率，防口舌是非。<br>';
+  else ans+='比劫之年，社交活跃、人脉扩展，但竞争也多，合伙须谨慎。<br>';
+  if(d.cl){var lgod2=tg(d.ds,d.cl.gz[0])[0];ans+='<br>当前大运为<strong>'+d.cl.gz+'（'+d.cl.ar+'）</strong>，运干为'+lgod2+'。'+(lgod2.indexOf("官")>=0?"官星主运，人生事业上升期。":lgod2.indexOf("财")>=0?"财运大运，物质条件改善中。":lgod2.indexOf("印")>=0?"印星护运，稳定发展期。":"变化与成长并存的阶段。")+'<br>'}
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《滴天髓阐微》：大运重看地支，流年重在干。大运管十年吉凶，流年管一年休咎。大运吉而流年凶，减其吉；大运凶而流年吉，减其凶。<br>';
+ }
+
+ // ========== GENERAL FALLBACK ==========
+ else{
+  ans+='<strong style="font-size:1.1em">咨询：'+q+'</strong><br><br>';
+  ans+='<span style="color:var(--accent)">【命盘速览】</span><br>';
+  var dw7=SW[d.ds]||"",s7=a2.strength,pats=a2.patterns;
+  ans+='你的八字：<strong>'+d.ps["年"].gz+' '+d.ps["月"].gz+' '+d.ps["日"].gz+' '+d.ps["时"].gz+'</strong><br>';
+  ans+='日主'+d.ds+dw7+'，生于'+d.ps["月"].branch+'月（'+s7.ws+'），'+s7.strength+'（'+s7.grade+'）。<br>';
+  ans+='喜用神：'+s7.xs.join('、')+'；忌神：'+s7.js.join('、')+'。<br>';
+  if(pats.length>0){ans+='入格：'+pats.map(function(p){return p.name}).join('、')+'。<br>'}
+  ans+='<br>你的问题涉及面较广，建议：<br>';
+  ans+='· 具体问婚姻→输入"婚姻"相关词汇<br>';
+  ans+='· 具体问事业→输入"工作"相关词汇<br>';
+  ans+='· 具体问财运→输入"发财"相关词汇<br>';
+  ans+='· 具体问健康→输入"身体"相关词汇<br>';
+  ans+='· 也可以点击上方的预设问题，获得更精准的分析。<br>';
+  ans+='<br><span style="color:var(--accent)">【命理依据】</span><br>';
+  ans+='《滴天髓阐微》：凡推命者，先看日主之强弱，次看格局之清浊，再看喜用之宜忌，然后推断吉凶。四柱八字虽为先天之命，但后天之努力、选择、修德，皆可改变命运之轨迹。<br>';
+ }
+ el.innerHTML='<div style="line-height:2.2;font-size:.95em">'+ans+'</div>';
+ el.style.display="block";
+ inp.value="";
 }
 setTimeout(function(){if(document.getElementById("qaCatBtn0"))showQACat(0)},100);
 </script>
