@@ -462,7 +462,6 @@ h+='</div></div>';
 h+='<div style="padding:20px;text-align:center;font-size:0.8em;color:var(--muted);line-height:2">以上分析基于八字命理古典典籍的推演，仅供文化参考。<br>命理之说，信则有、不信则无。<br>《了凡四训》云「命自我立，福自己求」，人生的主动权终究掌握在自己手中。</div>';
  document.getElementById("results").innerHTML=h;
 }
-</script>
 
 // ==================== Q&A MODULE ====================
 var QA=[
@@ -521,5 +520,6 @@ function askQA(qIdx){
  }catch(e){aEl.innerHTML="生成回答时出错，请重试。";aEl.style.display="block"}
 }
 setTimeout(function(){if(document.getElementById("qaCatBtn0"))showQACat(0)},100);
+</script>
 </body>
 </html>
