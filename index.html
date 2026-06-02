@@ -9,7 +9,14 @@
 :root {--bg:#fdf6ec;--card:#fffef9;--border:#d4c5a9;--text:#3a3226;--accent:#8b4513;--gold:#c9a96e;--red:#a04040;--muted:#6b5e4e;--highlight:#fff8e7;--shadow:0 2px 12px rgba(0,0,0,0.06)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:"Microsoft YaHei","SimSun",serif;background:var(--bg);color:var(--text);line-height:1.8;min-height:100vh}
-.header{background:linear-gradient(135deg,#2c1810,#4a2c1a,#2c1810);color:#e8d5b7;text-align:center;padding:24px 16px;border-bottom:3px solid var(--gold)}
+.header{background:linear-gradient(135deg,#2c1810,#4a2c1a,#2c1810);color:#e8d5b7;text-align:center;padding:24px 16px 8px;border-bottom:3px solid var(--gold)}
+.nav-tabs{display:flex;justify-content:center;gap:0;background:#2c1810;padding:0 16px 0}
+.nav-tab{padding:10px 24px;border:none;background:transparent;color:#b8956a;cursor:pointer;font-family:inherit;font-size:1em;letter-spacing:3px;border-bottom:3px solid transparent;transition:all .3s}
+.nav-tab.active{color:#e8d5b7;border-bottom-color:var(--gold)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.sub-tabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:16px 0}
+.sub-tab{padding:6px 14px;border:1px solid var(--border);border-radius:14px;background:var(--card);color:var(--text);cursor:pointer;font-family:inherit;font-size:.85em;letter-spacing:1px;transition:all .2s}
+.sub-tab.active{background:var(--accent);color:#fdf5e6;border-color:var(--accent)}
 .header h1{font-size:2em;font-weight:normal;letter-spacing:6px;margin-bottom:4px}
 .header p{font-size:.9em;color:#b8956a;letter-spacing:2px}
 .container{max-width:960px;margin:0 auto;padding:20px}
@@ -70,8 +77,15 @@ select:disabled,input:disabled{background:#f0f0f0;color:#999;cursor:not-allowed}
 </style>
 </head>
 <body>
-<div class="header"><h1>八字命理分析</h1><p>四柱八字 · 穷通宝鉴 · 三命通会 · 滴天髓阐微</p></div>
+<div class="header"><h1>玄学命理分析系统</h1><p>八字命理 · 传统术数 · 古典智慧</p></div>
+<div class="nav-tabs">
+<button class="nav-tab active" onclick="switchTab('bazi')">八字分析</button>
+<button class="nav-tab" onclick="switchTab('shushu')">术 数</button>
+<a href="zhougong.html" class="nav-tab" style="text-decoration:none">周公解梦</a>
+</div>
 <div class="container">
+<!-- ====== BAZI PANEL ====== -->
+<div class="tab-panel active" id="panel-bazi">
 <div class="form-card" id="formCard">
 <h2>请输入出生信息（公历）</h2>
 <div class="toggle-row" id="calendarToggle">
@@ -102,6 +116,67 @@ select:disabled,input:disabled{background:#f0f0f0;color:#999;cursor:not-allowed}
 <div class="loading" id="loading"><div class="spinner"></div><p style="color:var(--muted)">正在推演命盘，请稍候...</p></div>
 <div class="error-msg hidden" id="errorMsg"></div>
 <div id="results"></div>
+</div><!-- /panel-bazi -->
+
+<!-- ====== SHUSHU PANEL ====== -->
+<div class="tab-panel" id="panel-shushu">
+<div class="form-card">
+<h2>传统术数</h2>
+<div class="sub-tabs" id="shushuTabs">
+<button class="sub-tab active" onclick="switchSubTab('xiaoliuren')">小六壬</button>
+<button class="sub-tab" onclick="switchSubTab('liuyao')">六爻占卜</button>
+<button class="sub-tab" onclick="switchSubTab('meihua')">梅花易数</button>
+<button class="sub-tab" onclick="switchSubTab('qimen')">奇门遁甲</button>
+<button class="sub-tab" onclick="switchSubTab('ziwei')">紫微斗数</button>
+<button class="sub-tab" onclick="switchSubTab('daliuren')">大六壬</button>
+<button class="sub-tab" onclick="switchSubTab('taiyi')">太乙神数</button>
+</div>
+
+<!-- 小六壬 -->
+<div class="tab-panel active" id="sub-xiaoliuren">
+<h3 style="text-align:center;color:var(--accent);letter-spacing:3px;margin-bottom:16px">小六壬 · 掐指一算</h3>
+<p style="text-align:center;color:var(--muted);margin-bottom:16px">诸葛马前课，亦称掌中诀。月日时三数推演，断吉凶祸福。</p>
+<div class="form-row">
+<div class="form-group"><label>农历月份</label><input type="number" id="xlrMonth" min="1" max="12" placeholder="1-12"></div>
+<div class="form-group"><label>农历日期</label><input type="number" id="xlrDay" min="1" max="30" placeholder="1-30"></div>
+<div class="form-group"><label>时辰</label><select id="xlrHour"><option value="0">子时 23-1</option><option value="1">丑时 1-3</option><option value="2">寅时 3-5</option><option value="3">卯时 5-7</option><option value="4">辰时 7-9</option><option value="5">巳时 9-11</option><option value="6" selected>午时 11-13</option><option value="7">未时 13-15</option><option value="8">申时 15-17</option><option value="9">酉时 17-19</option><option value="10">戌时 19-21</option><option value="11">亥时 21-23</option></select></div>
+</div>
+<button class="btn-submit" onclick="calcXiaoLiuRen()" style="margin-top:8px">掐 指 一 算</button>
+<div id="xlrQuestion" placeholder="如：我今天面试能通过吗？"></div></div>
+<div class="form-row"><div class="form-group"><label>所问之事（必填）</label><input type="text" id="xlrQuestion" placeholder="如：今天面试能过吗？"></div></div>
+<div id="xlrResult" style="margin-top:16px;padding:16px;background:var(--highlight);border-radius:4px;display:none"></div>
+</div>
+
+<!-- 六爻 -->
+<div class="tab-panel" id="sub-liuyao">
+<h3 style="text-align:center;color:var(--accent);letter-spacing:3px;margin-bottom:16px">六爻 · 金钱卦</h3>
+<p style="text-align:center;color:var(--muted);margin-bottom:16px">取三枚铜钱，心中默念所问之事，掷六次成卦。或点击下方模拟掷币。</p>
+<div class="form-row"><div class="form-group"><label>所问之事（选填）</label><input type="text" id="lyQuestion" placeholder="默念你的问题..."></div></div>
+<div id="lyTosses" style="margin:12px 0"></div>
+<button class="btn-submit" id="lyTossBtn" onclick="tossLiuYao()">掷 币（第 1 / 6 次）</button>
+<div id="lyResult" style="margin-top:16px;padding:16px;background:var(--highlight);border-radius:4px;display:none"></div>
+</div>
+
+<!-- 梅花易数 -->
+<div class="tab-panel" id="sub-meihua">
+<h3 style="text-align:center;color:var(--accent);letter-spacing:3px;margin-bottom:16px">梅花易数 · 数字起卦</h3>
+<p style="text-align:center;color:var(--muted);margin-bottom:16px">输入三个数字（或当前时间自动生成），得上卦、下卦、动爻。</p>
+<div class="form-row">
+<div class="form-group"><label>上卦数</label><input type="number" id="mhNum1" placeholder="任意数字"></div>
+<div class="form-group"><label>下卦数</label><input type="number" id="mhNum2" placeholder="任意数字"></div>
+<div class="form-group"><label>动爻数</label><input type="number" id="mhNum3" placeholder="任意数字"></div>
+</div>
+<button class="btn-submit" onclick="calcMeiHua()">起 卦</button>
+<button class="btn-submit" style="background:var(--muted);margin-top:4px" onclick="document.getElementById('mhNum1').value=Math.floor(Math.random()*1000);document.getElementById('mhNum2').value=Math.floor(Math.random()*1000);document.getElementById('mhNum3').value=Math.floor(Math.random()*1000);calcMeiHua()">随机起卦</button>
+<div id="mhResult" style="margin-top:16px;padding:16px;background:var(--highlight);border-radius:4px;display:none"></div>
+</div>
+
+<!-- Placeholder panels for complex methods -->
+<div class="tab-panel" id="sub-qimen"><div class="form-card"><h3 style="text-align:center;color:var(--accent)">奇门遁甲</h3><p style="text-align:center;color:var(--muted)">排盘复杂，正在开发中。敬请期待。</p></div></div>
+<div class="tab-panel" id="sub-ziwei"><div class="form-card"><h3 style="text-align:center;color:var(--accent)">紫微斗数</h3><p style="text-align:center;color:var(--muted)">星曜排布复杂，正在开发中。敬请期待。</p></div></div>
+<div class="tab-panel" id="sub-daliuren"><div class="form-card"><h3 style="text-align:center;color:var(--accent)">大六壬</h3><p style="text-align:center;color:var(--muted)">天盘地盘排布复杂，正在开发中。敬请期待。</p></div></div>
+<div class="tab-panel" id="sub-taiyi"><div class="form-card"><h3 style="text-align:center;color:var(--accent)">太乙神数</h3><p style="text-align:center;color:var(--muted)">古老术数，资料稀缺，正在研究。敬请期待。</p></div></div>
+</div><!-- /panel-shushu -->
 </div>
 
 <script>
@@ -808,6 +883,126 @@ function askFreeQA(){
  addQACount();updateQuotaDisplay();
 }
 setTimeout(function(){if(document.getElementById("qaCatBtn0"))showQACat(0)},100);
+// ===== TAB SWITCHING =====
+function switchTab(name){
+ document.querySelectorAll(".nav-tab").forEach(function(b){b.classList.remove("active")});
+ event.target.classList.add("active");
+ document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.remove("active")});
+ document.getElementById("panel-"+name).classList.add("active");
+}
+function switchSubTab(name){
+ document.querySelectorAll("#shushuTabs .sub-tab").forEach(function(b){b.classList.remove("active")});
+ event.target.classList.add("active");
+ document.querySelectorAll("#panel-shushu .tab-panel").forEach(function(p){p.classList.remove("active")});
+ document.getElementById("sub-"+name).classList.add("active");
+}
+// ===== 小六壬 · 完整掌诀系统 =====
+// 参考：《道传小六壬》《卜法卷·马前六壬掌中诀》《江氏小六壬》《小六壬解惑》
+var XLR_DETAIL={
+ "大安":{idx:1,wx:"木",col:"青",dir:"东",beast:"青龙",nums:"1/5/7",s:"大吉",poem:"大安事事昌，求谋在东方。失物不远去，宅舍保安康。行人未动身，病人无妨。将军回田野，仔细好推详。",
+  marriage:"婚姻和合，求婚可成。宜用青色聘礼，找属虎兔马羊之人说媒。",
+  career:"事业安泰，宜守不宜攻。东方求职吉，与木相关行业有利。",
+  wealth:"财运平稳，正财可期。不宜投机，宜存蓄。主数一五七。",
+  health:"身体健康平安，注意肝胆调养。病者服药有灵，渐进康复。",
+  travel:"出行顺利，宜向东方。行人未动，失物在家寻找。",
+  lost:"失物在东方，仔细搜寻可找到。离家不远，被物件遮盖。"},
+ "留连":{idx:2,wx:"水",col:"黑",dir:"北",beast:"玄武",nums:"2/8/10",s:"小凶",poem:"留连事难成，求谋日不明。官事只宜缓，去者未回程。失物南方见，急讨方称心。",
+  marriage:"婚姻难成，宜缓不宜急。男方多犹豫，女方须静心等待。",
+  career:"事多阻碍，不宜强求。北方求职不利，宜等待时机。",
+  wealth:"财运不济，不宜投资。借钱难还，主数二八十。",
+  health:"病者缠绵难愈，需寻良医。注意肾脏、泌尿系统。",
+  travel:"出行不利，宜改期。行人未归，音信不通。",
+  lost:"失物在南方，已被移动。需尽快寻找，迟则难觅。"},
+ "速喜":{idx:3,wx:"火",col:"红",dir:"南",beast:"朱雀",nums:"3/6/9",s:"大吉",poem:"速喜喜来临，求财向南行。失物申午见，行人路上寻。官事有福德，病者无祸侵。",
+  marriage:"婚姻速成，喜讯将至。宜用红色聘礼，南方求谋最利。",
+  career:"求职顺利，南方火旺之地最吉。喜讯速至，适合快速决策。",
+  wealth:"财运亨通，偏财可期。投资宜快进快出。主数三六九。",
+  health:"病者速愈，服药见效快。注意心脏、眼睛保养。",
+  travel:"出行顺利，向南最吉。行人已在路上，即将到达。",
+  lost:"失物在南方，申午时可见。被人捡走，但仍可寻回。"},
+ "赤口":{idx:4,wx:"金",col:"白",dir:"西",beast:"白虎",nums:"4/7/10",s:"大凶",poem:"赤口主口舌，官非切要防。失物急去寻，行人有惊慌。鸡犬多作怪，病者出西方。",
+  marriage:"口舌之争，婚事受阻。需防第三者插足，不宜急嫁。",
+  career:"职场口舌是非多，宜谨言慎行。防小人暗算，签合同须谨慎。",
+  wealth:"财运破损，防破财。不宜投资合作。主数四七十。",
+  health:"注意肺部、呼吸道疾病。病者需防恶化，西方求医不利。",
+  travel:"出行有惊险，注意交通安全。行人失踪，需多方打探。",
+  lost:"失物难寻，已被破坏或带走。须紧急寻找，迟则无望。"},
+ "小吉":{idx:5,wx:"木",col:"绿",dir:"西南",beast:"六合",nums:"1/5/7",s:"大吉",poem:"小吉最吉昌，路上好商量。阴人来报喜，失物在坤方。行人立便至，交易甚是强。",
+  marriage:"婚姻大吉，喜事临门。宜请女性长辈说媒，西南方相亲最利。",
+  career:"事业顺利，有贵人相助。合作洽谈顺利，宜积极沟通。",
+  wealth:"财运亨通，合作求财有利。宜与人合伙。主数一五七。",
+  health:"身体康健，脾胃调和。病者服药有效，日渐好转。",
+  travel:"出行吉利，宜向西南。行人即将抵达，有喜讯传来。",
+  lost:"失物在西南方，仔细搜寻可得。可能被收在容器或包裹中。"},
+ "空亡":{idx:6,wx:"土",col:"黄",dir:"中央",beast:"勾陈",nums:"3/6/9",s:"大凶",poem:"空亡事不长，阴人多乖张。求财无利益，行人有灾殃。失物寻不见，官事主刑伤。",
+  marriage:"婚事难成，多虚情假意。宜静观其变，不宜轻易托付终身。",
+  career:"事业虚空，计划落空。宜重新规划，不要一意孤行。",
+  wealth:"财运空耗，不宜投资。借贷无着。主数三六九。",
+  health:"病情反复，需防误诊。注意脾胃保养。宜静养。",
+  travel:"出行不利，易迷失方向。行人无音讯，吉凶未卜。",
+  lost:"失物难寻，可能已不存在。搜索范围宜扩大，但可能无果。"}
+};
+var XLR_POS_ORDER=["大安","留连","速喜","赤口","小吉","空亡"];
+function calcXiaoLiuRen(){
+ var m=parseInt(document.getElementById("xlrMonth").value)||1;
+ var d2=parseInt(document.getElementById("xlrDay").value)||1;
+ var h=parseInt(document.getElementById("xlrHour").value)||6;
+ var pos=0;pos=(pos+m-1)%6;pos=(pos+d2-1)%6;pos=(pos+h)%6;
+ var name=XLR_POS_ORDER[pos],r=XLR_DETAIL[name],el=document.getElementById("xlrResult");
+ var h2='<div style="text-align:center;margin-bottom:16px">';
+ h2+='<span style="color:var(--muted)">推算：月上起日→日上起时</span><br>';
+ h2+='<span style="font-size:2em;color:'+(r.s.indexOf("吉")>=0?'var(--green)':'var(--red)')+'">'+name+'</span>';
+ h2+='<br><span style="font-size:1.1em">'+r.s+' · 五行属'+r.wx+' · 色'+r.col+' · 方'+r.dir+' · 临'+r.beast+' · 数'+r.nums+'</span></div>';
+ h2+='<div style="background:#fdfaf4;padding:12px;border-radius:4px;margin-bottom:8px"><strong>掌诀：</strong>「'+r.poem+'」</div>';
+ h2+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.9em">';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>婚姻：</strong>'+r.marriage+'</div>';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>事业：</strong>'+r.career+'</div>';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>财运：</strong>'+r.wealth+'</div>';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>健康：</strong>'+r.health+'</div>';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>出行：</strong>'+r.travel+'</div>';
+ h2+='<div style="padding:8px;background:#fff;border-radius:4px"><strong>失物：</strong>'+r.lost+'</div></div>';
+ h2+='<p style="font-size:.8em;color:var(--muted);margin-top:8px">参考：《道传小六壬》《卜法卷》《江氏小六壬》《小六壬解惑》</p>';
+ el.innerHTML=h2;el.style.display="block";
+}
+function tossLiuYao(){
+ var btn=document.getElementById("lyTossBtn"),el=document.getElementById("lyTosses");
+ var coins=[Math.random()>0.5?1:0,Math.random()>0.5?1:0,Math.random()>0.5?1:0];
+ var sum=coins[0]+coins[1]+coins[2],sym="",line="";
+ if(sum===3){sym="● ○";line=1}else if(sum===0){sym="× ×";line=0}else if(sum===2){sym="———";line=1}else{sym="- -";line=0}
+ LY_TOSSES.push(line);
+ var num=["一","二","三","四","五","六"][LY_COUNT];
+ el.innerHTML+='<div style="text-align:center;font-family:serif;font-size:1.4em;margin:4px 0">第'+num+'次：'+sym+'</div>';
+ LY_COUNT++;
+ if(LY_COUNT>=6){
+  btn.disabled=true;btn.textContent="卦成！";
+  var key=LY_TOSSES.join(""),gua=LY_64GUA[key]||"未收录卦象",rr=document.getElementById("lyResult");
+  rr.innerHTML='<h4 style="text-align:center;font-size:1.2em">'+gua+'</h4><p style="text-align:center;color:var(--muted)">六次掷币已完成。请根据卦名查阅《易经》详解。</p>';
+  rr.style.display="block";LY_TOSSES=[];LY_COUNT=0;
+  setTimeout(function(){btn.disabled=false;btn.textContent="掷 币（第 1 / 6 次）";el.innerHTML="";rr.style.display="none"},5000);
+ }else{btn.textContent="掷 币（第 "+(LY_COUNT+1)+" / 6 次）"}
+}
+// ===== 梅花易数 =====
+var MH_TRIGRAMS={0:"坤 ☷",1:"乾 ☰",2:"兑 ☱",3:"离 ☲",4:"震 ☳",5:"巽 ☴",6:"坎 ☵",7:"艮 ☶"};
+var MH_MEANINGS={
+ "乾":"天行健，君子以自强不息。主刚健、创造、领导。利大人君子之事。",
+ "坤":"地势坤，君子以厚德载物。主柔顺、包容、承载。利柔顺守成之事。",
+ "兑":"丽泽，君子以朋友讲习。主喜悦、口舌、沟通。利社交合作之事。",
+ "离":"明两作，君子以继明照四方。主光明、文化、美丽。利文化创意之事。",
+ "震":"洊雷，君子以恐惧修省。主动荡、变革、警醒。利变革行动之事。",
+ "巽":"随风，君子以申命行事。主渗透、顺从、潜入。利谋划渗透之事。",
+ "坎":"水洊至，君子以常德行。主险陷、智慧、流动。宜谨慎行事。",
+ "艮":"兼山，君子以思不出其位。主静止、阻隔、内敛。宜守不宜攻。"
+};
+function calcMeiHua(){
+ var n1=parseInt(document.getElementById("mhNum1").value)||Math.floor(Math.random()*100);
+ var n2=parseInt(document.getElementById("mhNum2").value)||Math.floor(Math.random()*100);
+ var n3=parseInt(document.getElementById("mhNum3").value)||Math.floor(Math.random()*100);
+ var up=n1%8,down=n2%8,move=(n3%6)||6;
+ var uname=MH_TRIGRAMS[up],dname=MH_TRIGRAMS[down];
+ var el=document.getElementById("mhResult");
+ el.innerHTML='<h4 style="text-align:center;font-size:1.2em">'+uname+'（上卦） + '+dname+'（下卦）</h4><p style="text-align:center;color:var(--muted)">动爻：第'+move+'爻</p><p><strong>上卦释义：</strong>'+MH_MEANINGS[Object.keys(MH_TRIGRAMS).find(function(k){return MH_TRIGRAMS[k]===uname})]+'</p><p><strong>下卦释义：</strong>'+MH_MEANINGS[Object.keys(MH_TRIGRAMS).find(function(k){return MH_TRIGRAMS[k]===dname})]+'</p><p style="color:var(--accent)">提示：上卦为外因、对方、环境；下卦为内因、自己、根本。动爻所在位置表示事情的变化关键点。结合两卦的含义综合判断所问之事。</p>';
+ el.style.display="block";
+}
 </script>
 </body>
 </html>
